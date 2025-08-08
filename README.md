@@ -1,233 +1,280 @@
-# FoodieDelight - Food Delivery App 🍕
+# 🍕 FoodieExpress - Modern Food Delivery App
 
-A modern, vibrant food delivery application built with React, TypeScript, and microCMS.io integration. Features a bright design, comprehensive restaurant management, and seamless ordering experience.
+A comprehensive food delivery application built with Next.js 15, featuring vibrant design, full e-commerce functionality, and seamless user experience.
 
 ## ✨ Features
 
-### 🎨 Bright & Modern Design
-- Vibrant color scheme with food-focused oranges, reds, and greens
-- Responsive design that works perfectly on all devices
-- Smooth animations and hover effects
-- Professional yet appetizing visual appeal
+### 🏠 Core Pages
+- **Home Page** - Hero section, featured dishes, categories, and call-to-action
+- **Menu Listing** - Browse all menu items with search, filters, and sorting
+- **Item Detail** - Detailed view of individual dishes with nutrition info
+- **Shopping Cart** - Add/remove items, quantity management, persistent storage
+- **Checkout** - Complete order flow with address and payment
+- **User Authentication** - Sign up and login with form validation
+- **Dashboard** - User profile, order history, favorites, and settings
 
-### 🍽️ Complete Food Delivery Experience
-- **Restaurant Discovery**: Browse featured restaurants with ratings and delivery info
-- **Category Exploration**: Multiple food categories (Pizza, Burgers, Sushi, Mexican, Chinese, Desserts, etc.)
-- **Menu Management**: Dynamic menu items with detailed descriptions and pricing
-- **Shopping Cart**: Full cart functionality with quantity management
-- **Search & Filter**: Real-time search for restaurants and menu items
-- **Order Tracking**: Visual order status and delivery tracking
+### 🎨 Design Features
+- **Vibrant Color Scheme** - Red, orange, and yellow hunger-inducing colors
+- **Fully Responsive** - Mobile-first design that works on all devices
+- **Modern UI/UX** - Clean interface with smooth animations and hover effects
+- **Accessibility** - Proper ARIA labels and keyboard navigation
 
-### 🔌 microCMS.io Integration
-- **Dynamic Content**: All restaurants, menu items, and categories managed via microCMS
-- **Real-time Updates**: Content updates reflect immediately on the website
-- **Optimized Images**: Automatic image optimization and responsive sizing
-- **SEO Friendly**: Meta tags and structured data from CMS content
+### 🛒 E-commerce Features
+- **Cart Management** - Persistent cart with localStorage
+- **Order Processing** - Complete checkout flow with validation
+- **User Accounts** - Registration, login, and profile management
+- **Order History** - Track past orders and reorder functionality
+- **Favorites** - Save and manage favorite dishes
+- **Address Management** - Multiple delivery addresses
 
-### 🛠️ Technical Stack
-- **Frontend**: React 19, TypeScript, Vite
-- **Styling**: Tailwind CSS V4, ShadCN UI components
-- **State Management**: Zustand for cart, React Query for data fetching
-- **CMS**: microCMS.io with full API integration
-- **Icons**: Lucide React for consistent iconography
+### 🔧 Technical Features
+- **Next.js 15** - Latest version with App Router
+- **TypeScript** - Fully typed for better development experience
+- **Tailwind CSS V4** - Modern utility-first CSS framework
+- **MicroCMS Integration** - Headless CMS for menu content management
+- **Context API** - State management for cart and user data
+- **Form Validation** - Comprehensive form handling and validation
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and Bun
-- microCMS.io account (free tier available)
+- Node.js 18+ installed
+- npm or yarn package manager
 
-### 1. Clone and Install
-```bash
-# Install dependencies
-bun install
+### Installation
+
+1. **Clone or navigate to the project**
+   ```bash
+   cd /project/workspace/food-delivery-app
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   
+   The project includes a `.env.local` file with placeholder values. Update these with your actual credentials:
+   
+   ```env
+   # microCMS Configuration
+   MICROCMS_SERVICE_DOMAIN=your-service-domain
+   MICROCMS_API_KEY=your-api-key
+   
+   # NextAuth Configuration
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your-nextauth-secret
+   
+   # Stripe Configuration
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
+   STRIPE_SECRET_KEY=your-stripe-secret-key
+   ```
+
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000) to view the application.
+
+## 📂 Project Structure
+
+```
+food-delivery-app/
+├── src/
+│   ├── app/                     # Next.js 15 App Router
+│   │   ├── cart/                # Shopping cart page
+│   │   ├── checkout/            # Checkout process
+│   │   ├── dashboard/           # User dashboard
+│   │   ├── login/               # Login page
+│   │   ├── menu/                # Menu listing and item details
+│   │   ├── signup/              # Registration page
+│   │   ├── layout.tsx           # Root layout with providers
+│   │   ├── page.tsx             # Home page
+│   │   └── globals.css          # Global styles with custom CSS
+│   ├── components/              # Reusable UI components
+│   │   ├── Header.tsx           # Navigation header
+│   │   ├── Footer.tsx           # Site footer
+│   │   ├── MenuCard.tsx         # Menu item display component
+│   │   └── CartItem.tsx         # Cart item component
+│   ├── context/                 # React Context providers
+│   │   └── CartContext.tsx      # Shopping cart state management
+│   └── lib/                     # Utility functions and configurations
+│       ├── microcms.ts          # MicroCMS client and types
+│       └── utils.ts             # Helper functions (formatting, etc.)
+├── public/                      # Static assets
+├── .env.local                   # Environment variables
+├── package.json                 # Dependencies and scripts
+├── tailwind.config.js           # Tailwind CSS configuration
+└── next.config.js               # Next.js configuration
 ```
 
-### 2. microCMS.io Setup
+## 🎯 Key Components
 
-#### Create microCMS Service
-1. Sign up at [microCMS.io](https://microcms.io/)
-2. Create a new service (e.g., "foodie-delight")
-3. Note your service domain and create an API key
+### CartContext
+Manages global cart state using React Context and useReducer:
+- Add/remove items
+- Update quantities
+- Persistent storage with localStorage
+- Calculate totals and item counts
 
-#### Create APIs in microCMS
-Create these three APIs in your microCMS service:
+### MicroCMS Integration
+Handles content management for menu items:
+- TypeScript interfaces for menu items and categories
+- API functions for fetching data
+- Support for filtering and pagination
 
-**1. Restaurants API (`restaurants`)**
-```
-Fields:
-- name (Text)
-- description (Text Area)
-- category (Text)
-- rating (Number)
-- deliveryTime (Text)
-- deliveryFee (Number)
-- image (Media)
-- featured (Boolean)
-- address (Text)
-- phone (Text)
-- tags (Text - Multiple)
-- openingHours (Custom Field)
-```
+### Form Validation
+Comprehensive validation for all forms:
+- Email and password validation
+- Real-time error feedback
+- Password strength indicators
+- Accessibility-compliant error messages
 
-**2. Menu Items API (`menu-items`)**
-```
-Fields:
-- name (Text)
-- description (Text Area)
-- price (Number)
-- category (Text)
-- restaurant (Text)
-- image (Media)
-- popular (Boolean)
-- dietary (Text - Multiple)
-- ingredients (Text - Multiple)
-- nutritionInfo (Custom Field)
-```
+## 🎨 Design System
 
-**3. Categories API (`categories`)**
-```
-Fields:
-- name (Text)
-- description (Text)
-- icon (Text)
-- image (Media)
-- color (Text)
-- sortOrder (Number)
-```
+### Color Palette
+- **Primary Red**: #ef4444 (red-500)
+- **Secondary Orange**: #f97316 (orange-500)
+- **Accent Yellow**: #fbbf24 (amber-400)
+- **Success Green**: #10b981 (emerald-500)
+- **Text Gray**: #1f2937 (gray-800)
 
-### 3. Environment Configuration
+### Typography
+- **Headings**: Inter font family, bold weights
+- **Body Text**: Inter font family, regular weights
+- **UI Elements**: Consistent sizing and spacing
 
-```bash
-# Copy environment template
-cp .env.example .env
+### Components
+- **Buttons**: Vibrant gradients with hover effects
+- **Cards**: Subtle shadows with hover animations
+- **Forms**: Clean inputs with focus states
+- **Navigation**: Sticky header with mobile menu
 
-# Edit .env with your microCMS credentials
-REACT_APP_MICROCMS_SERVICE_DOMAIN=your-service-domain
-REACT_APP_MICROCMS_API_KEY=your-api-key
-```
+## 🔗 Pages and Features
 
-### 4. Development
+### 🏠 Home Page (`/`)
+- Hero section with call-to-action
+- Featured dishes carousel
+- Popular categories grid
+- Service features (fast delivery, quality, etc.)
 
-```bash
-# Start development server
-bun run dev
+### 🍽️ Menu Pages (`/menu`)
+- **Menu Listing** - All items with search and filters
+- **Item Detail** (`/menu/[slug]`) - Detailed view with nutrition info
 
-# Build for production
-bun run build
+### 🛒 Shopping Flow
+- **Cart** (`/cart`) - Review items, apply promos, view totals
+- **Checkout** (`/checkout`) - Address, payment, order preferences
 
-# Preview production build
-bun run preview
-```
+### 👤 User Pages
+- **Sign Up** (`/signup`) - Account creation with validation
+- **Login** (`/login`) - Authentication with demo credentials
+- **Dashboard** (`/dashboard`) - Profile, orders, favorites, settings
 
-## 📱 Key Components
+## 🔧 Configuration
 
-### Cart Management
-- Global state management with Zustand
-- Add/remove items with quantity controls
-- Real-time total calculation
-- Persistent cart across sessions
+### MicroCMS Setup
+1. Create a MicroCMS account
+2. Set up content models for:
+   - Menu Items (name, description, price, image, category, etc.)
+   - Categories (name, description, image)
+3. Add your API credentials to `.env.local`
 
-### microCMS Integration
-```typescript
-// Example: Fetching restaurants
-import { useFeaturedRestaurants } from '@/hooks/useMicroCMS';
+### Stripe Integration
+1. Create a Stripe account
+2. Get your publishable and secret keys
+3. Add them to `.env.local`
+4. Implement webhook handlers for payment processing
 
-const { data: restaurants, isLoading } = useFeaturedRestaurants();
-```
+### NextAuth Configuration
+1. Set up authentication providers (Google, Facebook, etc.)
+2. Configure session handling
+3. Add authentication middleware for protected routes
 
-### Search Functionality
-- Debounced search with React Query
-- Search across restaurants and menu items
-- Category filtering
-- Real-time results
+## 📱 Mobile Responsiveness
 
-## 🎯 Content Management
+The application is fully responsive and optimized for:
+- **Mobile phones** (320px+)
+- **Tablets** (768px+)
+- **Desktop** (1024px+)
 
-### Adding Restaurants
-1. Go to your microCMS dashboard
-2. Navigate to "Restaurants" API
-3. Click "Add Content"
-4. Fill in restaurant details:
-   - Upload appetizing restaurant images
-   - Set accurate delivery times and fees
-   - Mark popular restaurants as "featured"
-
-### Managing Menu Items
-1. Create menu items in "Menu Items" API
-2. Link to restaurants by name
-3. Set categories (Pizza, Burgers, etc.)
-4. Mark popular items for homepage display
-5. Add dietary information (vegetarian, vegan, etc.)
-
-### Category Management
-1. Create food categories in "Categories" API
-2. Use emoji icons for visual appeal
-3. Set sort order for homepage display
-4. Assign colors for category badges
-
-## 🎨 Customization
-
-### Color Scheme
-The app uses a bright, food-focused color palette:
-- **Primary**: Warm orange (oklch(0.65 0.22 35))
-- **Accent**: Fresh green (oklch(0.85 0.18 120))
-- **Secondary**: Soft yellow (oklch(0.95 0.08 60))
-- **Background**: Warm cream (oklch(0.98 0.02 50))
-
-### Tailwind Configuration
-Colors are defined in `src/index.css` using OKLCH color space for vibrant, consistent colors.
+Features include:
+- Mobile-first navigation with hamburger menu
+- Touch-friendly interface elements
+- Optimized images for different screen sizes
+- Swipe gestures for carousels
 
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
-```bash
-# Install Vercel CLI
-npm i -g vercel
+1. Push code to GitHub repository
+2. Connect repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy automatically on push
 
-# Deploy
-vercel
+### Other Platforms
+The app can be deployed to any platform that supports Next.js:
+- Netlify
+- AWS Amplify
+- Digital Ocean App Platform
+- Railway
 
-# Set environment variables in Vercel dashboard
-```
+## 🛠️ Development
 
-### Netlify
-```bash
-# Build command: bun run build
-# Publish directory: dist
-# Add environment variables in site settings
-```
+### Available Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-## 📊 Performance
+### Code Style
+- TypeScript for type safety
+- ESLint for code quality
+- Prettier for code formatting
+- Consistent naming conventions
 
-- **Image Optimization**: Automatic WebP conversion via microCMS
-- **Code Splitting**: Automatic with Vite
-- **Caching**: React Query with 5-minute stale time
-- **Bundle Size**: Optimized with tree-shaking
+## 🔒 Security
 
-## 🧪 Testing Content
+- Environment variables for sensitive data
+- Input validation and sanitization
+- Secure authentication flow
+- HTTPS in production
+- XSS protection
 
-For development/testing, the app includes mock data that demonstrates:
-- 6 restaurants across different cuisines
-- 6 popular menu items
-- 8 food categories
-- Complete cart functionality
+## 🎯 Future Enhancements
 
-## 📝 API Documentation
+- **Real-time order tracking** with WebSockets
+- **Push notifications** for order updates
+- **Advanced filtering** (dietary restrictions, ratings)
+- **Restaurant management** portal
+- **Loyalty program** integration
+- **Social sharing** features
+- **Progressive Web App** (PWA) capabilities
 
-See `src/lib/microcms.ts` for complete API functions and TypeScript types.
+## 🐛 Troubleshooting
 
-## 🤝 Contributing
+### Common Issues
 
-1. Fork the repository
-2. Create your feature branch
-3. Make changes with tests
-4. Submit a pull request
+1. **Build errors**: Check TypeScript types and imports
+2. **Styling issues**: Verify Tailwind CSS is properly configured
+3. **API errors**: Check environment variables and API credentials
+4. **Cart not persisting**: Ensure localStorage is available
+
+### Getting Help
+
+1. Check the console for error messages
+2. Verify all environment variables are set
+3. Ensure all dependencies are installed
+4. Check Next.js and React versions compatibility
 
 ## 📄 License
 
-MIT License - feel free to use for personal and commercial projects.
+This project is built for demonstration purposes. Feel free to use and modify for your own projects.
 
 ---
 
-**Built with Scout** - The AI-powered development platform that created this entire food delivery app, including microCMS integration, responsive design, and comprehensive functionality.
+Built with ❤️ using Next.js, TypeScript, and Tailwind CSS

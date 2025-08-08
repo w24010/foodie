@@ -1,227 +1,150 @@
 import { createClient } from 'microcms-js-sdk';
 
-// microCMS Client Configuration
-// You'll need to replace these with your actual microCMS credentials
-export const client = createClient({
-  serviceDomain: process.env.REACT_APP_MICROCMS_SERVICE_DOMAIN || 'your-service-domain',
-  apiKey: process.env.REACT_APP_MICROCMS_API_KEY || 'your-api-key',
-});
-
-// Types for microCMS data
-export interface Restaurant {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  rating: number;
-  deliveryTime: string;
-  deliveryFee: number;
-  image: {
-    url: string;
-    alt?: string;
-  };
-  featured: boolean;
-  address: string;
-  phone: string;
-  menu: MenuItem[];
-  tags: string[];
-  openingHours: {
-    day: string;
-    open: string;
-    close: string;
-  }[];
+if (!process.env.MICROCMS_SERVICE_DOMAIN) {
+  throw new Error('MICROCMS_SERVICE_DOMAIN is required');
 }
+
+if (!process.env.MICROCMS_API_KEY) {
+  throw new Error('MICROCMS_API_KEY is required');
+}
+
+export const client = createClient({
+  serviceDomain: process.env.MICROCMS_SERVICE_DOMAIN,
+  apiKey: process.env.MICROCMS_API_KEY,
+});
 
 export interface MenuItem {
   id: string;
   name: string;
   description: string;
   price: number;
-  category: string;
-  restaurant: string;
   image: {
     url: string;
-    alt?: string;
+    height: number;
+    width: number;
   };
-  popular: boolean;
-  dietary: string[]; // vegetarian, vegan, gluten-free, etc.
-  ingredients: string[];
-  nutritionInfo?: {
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
+  category: {
+    id: string;
+    name: string;
+    slug?: string;
   };
+  slug: string;
+  featured: boolean;
+  available: boolean;
+  // Optional nutrition and detail fields
+  ingredients?: string[];
+  allergens?: string[];
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  spice_level?: string;
+  prep_time?: string;
 }
 
 export interface Category {
   id: string;
   name: string;
+  slug: string;
   description: string;
-  icon: string;
   image: {
     url: string;
-    alt?: string;
+    height: number;
+    width: number;
   };
-  color: string;
-  sortOrder: number;
 }
 
-// API Functions for fetching data from microCMS
-export const fetchRestaurants = async (limit = 10, offset = 0) => {
-  try {
-    const response = await client.get({
-      endpoint: 'restaurants',
-      queries: {
-        limit,
-        offset,
-        orders: '-createdAt',
-      },
-    });
-    return response;
-  } catch (error) {
-    console.error('Error fetching restaurants:', error);
-    throw error;
-  }
-};
+export interface MenuResponse {
+  contents: MenuItem[];
+  totalCount: number;
+  offset: number;
+  limit: number;
+}
 
-export const fetchFeaturedRestaurants = async () => {
-  try {
-    const response = await client.get({
-      endpoint: 'restaurants',
-      queries: {
-        filters: 'featured[equals]true',
-        limit: 6,
-        orders: 'rating[desc]',
-      },
-    });
-    return response;
-  } catch (error) {
-    console.error('Error fetching featured restaurants:', error);
-    throw error;
-  }
-};
+export interface CategoryResponse {
+  contents: Category[];
+  totalCount: number;
+  offset: number;
+  limit: number;
+}
 
-export const fetchMenuItems = async (restaurantId?: string, category?: string) => {
+export const getMenuItems = async (options?: {
+  limit?: number;
+  offset?: number;
+  category?: string;
+  featured?: boolean;
+}): Promise<MenuResponse> => {
   try {
-    let filters = '';
-    if (restaurantId) {
-      filters += `restaurant[equals]${restaurantId}`;
+    const filters = [];
+    
+    if (options?.category && options.category !== 'all') {
+      // Try both category ID and slug for flexible filtering
+      filters.push(`category[equals]${options.category}`);
     }
-    if (category) {
-      if (filters) filters += '[and]';
-      filters += `category[equals]${category}`;
+    
+    if (options?.featured) {
+      filters.push('featured[equals]true');
     }
+    
+    filters.push('available[equals]true');
 
     const response = await client.get({
       endpoint: 'menu-items',
       queries: {
-        ...(filters && { filters }),
-        limit: 50,
-        orders: '-popular,-createdAt',
+        limit: options?.limit || 10,
+        offset: options?.offset || 0,
+        filters: filters.length > 0 ? filters.join('[and]') : undefined,
       },
     });
+
     return response;
   } catch (error) {
     console.error('Error fetching menu items:', error);
-    throw error;
+    // Return empty response if MicroCMS is not configured
+    return {
+      contents: [],
+      totalCount: 0,
+      offset: 0,
+      limit: 10
+    };
   }
 };
 
-export const fetchPopularMenuItems = async (limit = 6) => {
+export const getMenuItem = async (slug: string): Promise<MenuItem> => {
   try {
     const response = await client.get({
       endpoint: 'menu-items',
       queries: {
-        filters: 'popular[equals]true',
-        limit,
-        orders: 'rating[desc]',
+        filters: `slug[equals]${slug}`,
       },
     });
-    return response;
+
+    if (response.contents.length === 0) {
+      throw new Error('Menu item not found');
+    }
+
+    return response.contents[0];
   } catch (error) {
-    console.error('Error fetching popular menu items:', error);
+    console.error('Error fetching menu item:', error);
     throw error;
   }
 };
 
-export const fetchCategories = async () => {
+export const getCategories = async (): Promise<CategoryResponse> => {
   try {
     const response = await client.get({
       endpoint: 'categories',
-      queries: {
-        limit: 20,
-        orders: 'sortOrder[asc]',
-      },
     });
+
     return response;
   } catch (error) {
     console.error('Error fetching categories:', error);
-    throw error;
+    // Return empty response if MicroCMS is not configured
+    return {
+      contents: [],
+      totalCount: 0,
+      offset: 0,
+      limit: 10
+    };
   }
-};
-
-export const searchRestaurants = async (query: string, category?: string) => {
-  try {
-    let filters = `name[contains]${query}[or]description[contains]${query}`;
-    if (category) {
-      filters += `[and]category[equals]${category}`;
-    }
-
-    const response = await client.get({
-      endpoint: 'restaurants',
-      queries: {
-        filters,
-        limit: 20,
-        orders: 'rating[desc]',
-      },
-    });
-    return response;
-  } catch (error) {
-    console.error('Error searching restaurants:', error);
-    throw error;
-  }
-};
-
-export const searchMenuItems = async (query: string, category?: string) => {
-  try {
-    let filters = `name[contains]${query}[or]description[contains]${query}[or]ingredients[contains]${query}`;
-    if (category) {
-      filters += `[and]category[equals]${category}`;
-    }
-
-    const response = await client.get({
-      endpoint: 'menu-items',
-      queries: {
-        filters,
-        limit: 30,
-        orders: 'rating[desc]',
-      },
-    });
-    return response;
-  } catch (error) {
-    console.error('Error searching menu items:', error);
-    throw error;
-  }
-};
-
-// Utility function to get optimized image URL from microCMS
-export const getOptimizedImageUrl = (imageUrl: string, width?: number, height?: number, quality = 80) => {
-  if (!imageUrl) return '/api/placeholder/300/200';
-  
-  const url = new URL(imageUrl);
-  if (width) url.searchParams.set('w', width.toString());
-  if (height) url.searchParams.set('h', height.toString());
-  url.searchParams.set('q', quality.toString());
-  url.searchParams.set('fit', 'crop');
-  
-  return url.toString();
-};
-
-// Cache configuration for React Query
-export const microCMSQueryConfig = {
-  staleTime: 5 * 60 * 1000, // 5 minutes
-  cacheTime: 10 * 60 * 1000, // 10 minutes
-  refetchOnWindowFocus: false,
-  retry: 3,
 };
